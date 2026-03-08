@@ -10,7 +10,7 @@ let isScanning  = false;
 let sessionStart = null;
 let lastScannedId = null; // Tránh quét lặp 1 mã quá nhanh
 let lastScanTime = 0;
-let sessionId = Date.now();
+let sessionId = new Date().toISOString().slice(0,10);
 // ---------- Khởi tạo sau khi DOM sẵn sàng ----------
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Tải dữ liệu từ file CSV trước
@@ -135,7 +135,7 @@ function clearAll() {
   localStorage.removeItem("students");
 
   sessionStart = null;
-  sessionId = Date.now(); // tạo phiên mới
+  sessionId = new Date().toISOString().slice(0,10); // tạo phiên mới
 
   document.getElementById('session-time').textContent = '--:--';
 
@@ -149,6 +149,7 @@ function updateStats() {
 
 function renderList() {
   const listEl = document.getElementById('student-list');
+  const isNew = Date.now() - new Date("1970/01/01 " + s.time).getTime() < 5000;
   document.getElementById('list-count').textContent = students.length;
   document.getElementById('btn-export').disabled = students.length === 0; 
 
@@ -262,7 +263,6 @@ function onScanSuccess(decodedText) {
   if (ok) {
     playBeep();
     showToast('✅ Đã điểm danh: ' + id + (name ? ' — ' + name : ''));
-    sendToSheet(id, name);
   }
 }
 
@@ -374,13 +374,15 @@ function syncFromSheet() {
 
   const script = document.createElement("script");
   script.id = "syncScript";
-  script.src = "https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec" + "?callback=handleSheetData";
-
+  script.src =
+  "https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec"
+  + "?session=" + sessionId
+  + "&callback=handleSheetData";
   document.body.appendChild(script);
 }
 function handleSheetData(data) {
 
-  students = data
+  const newStudents = data
   .filter(r => r.session == sessionId)
   .map(r => ({
     id: r.mssv,
@@ -388,7 +390,10 @@ function handleSheetData(data) {
     time: new Date(r.time).toLocaleTimeString('vi-VN')
   }));
 
+  if (JSON.stringify(newStudents) === JSON.stringify(students)) return;
+
+  students = newStudents;
+
   renderList();
   updateStats();
-
 }

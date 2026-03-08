@@ -112,7 +112,7 @@ function addStudent(id, name = '') {
   students.unshift({ id, name, time: currentTime() });
 
   saveLocal();
-  sendToSheet(mssv, ten)
+  sendToSheet(id, name);
   renderList();
   updateStats();
   if (!sessionStart) sessionStart = Date.now();
@@ -186,7 +186,6 @@ function addManual() {
   const ok = addStudent(id, name);
   if (ok) {
     showToast('✅ Đã lưu: ' + id + (name ? ' — ' + name : ''));
-    sendToSheet(id, name);
   } else {
     showToast('⚠️ MSSV ' + id + ' đã điểm danh!', true);
   }
@@ -368,24 +367,28 @@ fetch("https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3
 });
 
 }
-async function syncFromSheet(){
+function syncFromSheet() {
 
-  try {
+  const old = document.getElementById("syncScript");
+  if (old) old.remove();
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec");
-    const data = await res.json();
+  const script = document.createElement("script");
+  script.id = "syncScript";
+  script.src = "https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec" + "?callback=handleSheetData";
 
-    students = data.filter(r => r.session == sessionId).map(r => ({
+  document.body.appendChild(script);
+}
+function handleSheetData(data) {
+
+  students = data
+  .filter(r => r.session == sessionId)
+  .map(r => ({
     id: r.mssv,
     name: r.ten,
     time: new Date(r.time).toLocaleTimeString('vi-VN')
   }));
 
-    renderList();
-    updateStats();
-
-  } catch(err) {
-    console.log("Sync error", err);
-  }
+  renderList();
+  updateStats();
 
 }

@@ -352,19 +352,15 @@ function loadLocal() {
 }
 
 function sendToSheet(mssv, ten){
+
 fetch("https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec", {
   method: "POST",
+  mode: "no-cors",
   body: JSON.stringify({
     session: sessionId,
     mssv: mssv,
     ten: ten
-  }),
-  headers: {
-    "Content-Type": "application/json"
-  }
-})
-.then(res => res.text())
-.then(data => console.log("Saved:", data))
-.catch(err => console.error(err));
+  })
+});
 
 }

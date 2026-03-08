@@ -175,15 +175,30 @@ function renderList() {
 }
 
 // ---------- Nhập thủ công ----------
+// ---------- Nhập thủ công ----------
 function addManual() {
   const input = document.getElementById('manual-input');
   const id = input.value.trim();
   if (!id) return;
 
-  const name = studentDB[id] || "";
+  let name = studentDB[id] || "";
+  
+  // TÍNH NĂNG MỚI: Hỏi tên nếu gõ MSSV chưa có trong CSV
+  if (name === "") {
+    const inputName = prompt(`⚠️ MSSV ${id} chưa có trong danh sách!\nVui lòng nhập họ và tên sinh viên:`);
+    
+    if (inputName === null || inputName.trim() === "") {
+      showToast('❌ Đã hủy điểm danh cho MSSV ' + id, true);
+      return;
+    }
+    
+    name = inputName.trim();
+    studentDB[id] = name; 
+  }
+
   const ok = addStudent(id, name);
   if (ok) {
-    showToast('✅ Đã lưu: ' + id + (name ? ' — ' + name : ''));
+    showToast('✅ Đã lưu: ' + id + ' — ' + name);
   } else {
     showToast('⚠️ MSSV ' + id + ' đã điểm danh!', true);
   }
@@ -245,11 +260,27 @@ function onScanSuccess(decodedText) {
 
   if (students.find(s => s.id === id)) return; 
 
-  const name = studentDB[id] || "";
+  let name = studentDB[id] || "";
+
+  // TÍNH NĂNG MỚI: Hỏi tên nếu MSSV chưa có trong CSV
+  if (name === "") {
+    playBeep(); // Kêu 1 tiếng để người quét chú ý nhìn màn hình
+    const inputName = prompt(`⚠️ MSSV ${id} chưa có trong danh sách!\nVui lòng nhập họ và tên sinh viên:`);
+    
+    // Nếu bấm Hủy (Cancel) hoặc để trống thì từ chối điểm danh
+    if (inputName === null || inputName.trim() === "") {
+      showToast('❌ Đã hủy điểm danh cho MSSV ' + id, true);
+      return; 
+    }
+    
+    name = inputName.trim();
+    studentDB[id] = name; // Lưu tên vừa nhập vào bộ nhớ tạm để dùng lại nếu cần
+  }
+
   const ok = addStudent(id, name);
   if (ok) {
     playBeep();
-    showToast('✅ Đã điểm danh: ' + id + (name ? ' — ' + name : ''));
+    showToast('✅ Đã điểm danh: ' + id + ' — ' + name);
   }
 }
 
@@ -342,23 +373,30 @@ function syncFromSheet() {
   document.body.appendChild(script);
 }
 function handleSheetData(data) {
-
+  // 1. Lọc và chuẩn hóa dữ liệu từ Sheet
   const sheetStudents = data
     .filter(r => r.session === sessionId)
     .map(r => ({
       id: String(r.mssv),
       name: r.ten,
-      time: new Date(r.time).toLocaleTimeString('vi-VN')
-    }));
+      time: new Date(r.time).toLocaleTimeString('vi-VN', { hour12: false }) // Ép chuẩn định dạng giờ 24h
+    }))
+    .reverse(); // Đảo ngược để người mới nhất lên đầu (giống lúc quét)
 
-  const existingIds = new Set(students.map(s => s.id));
+  // 2. Chống ghi đè (Anti-lag cho Sheet)
+  // Nếu Sheet tải về ít người hơn màn hình đang có -> Sheet chưa lưu kịp -> Bỏ qua
+  if (sheetStudents.length < students.length) return;
 
-  sheetStudents.forEach(s => {
-    if (!existingIds.has(s.id)) {
-      students.unshift(s);
-    }
-  });
+  // 3. KHÓA RENDER (CHỐNG NHÁY MÀN HÌNH)
+  // Gom tất cả MSSV hiện có thành 1 chuỗi (VD: "24134035,24156012") để so sánh
+  const currentIds = students.map(s => s.id).join(',');
+  const sheetIds = sheetStudents.map(s => s.id).join(',');
 
+  // NẾU CHUỖI MSSV GIỐNG HỆT NHAU -> DỪNG LẠI NGAY, KHÔNG VẼ LẠI MÀN HÌNH!
+  if (currentIds === sheetIds) return;
+
+  // 4. Cập nhật và vẽ lại màn hình (chỉ chạy khi thực sự có người quét mới)
+  students = sheetStudents;
   saveLocal();
   renderList();
   updateStats();

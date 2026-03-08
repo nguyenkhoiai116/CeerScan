@@ -343,17 +343,33 @@ function syncFromSheet() {
 }
 
 function handleSheetData(data) {
-  const newStudents = data
+  // 1. Lọc và chuẩn hóa dữ liệu từ Sheet
+  const sheetStudents = data
     .filter(r => r.session === sessionId)
     .map(r => ({
       id: String(r.mssv),
       name: r.ten,
       time: new Date(r.time).toLocaleTimeString('vi-VN')
-    }));
+    }))
+    .reverse(); // Đảo ngược mảng để dữ liệu mới nhất lên đầu (giống trên máy)
 
-  if (JSON.stringify(newStudents) === JSON.stringify(students)) return;
+  // 2. CHỐNG GHI ĐÈ DỮ LIỆU CŨ (Fix lỗi mất liền)
+  // Nếu dữ liệu từ Sheet tải về ít hơn số người máy đang hiển thị
+  // -> Sheet chưa lưu kịp -> Bỏ qua, giữ nguyên màn hình hiện tại
+  if (sheetStudents.length < students.length) {
+    return;
+  }
 
-  students = newStudents;
+  // 3. Kiểm tra xem có thật sự có dữ liệu mới không (so sánh theo mssv)
+  // (Thay vì dùng JSON.stringify rất dễ lỗi định dạng thời gian)
+  const currentIds = students.map(s => s.id).join(',');
+  const sheetIds = sheetStudents.map(s => s.id).join(',');
+
+  if (currentIds === sheetIds) return;
+
+  // 4. Cập nhật khi có dữ liệu mới (ví dụ: máy tính khác quét)
+  students = sheetStudents;
+  saveLocal();
   renderList();
   updateStats();
 }

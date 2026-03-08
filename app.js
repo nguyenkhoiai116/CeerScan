@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   setInterval(updateSessionTimer, 1000);
+  setInterval(syncFromSheet, 3000);
 });
 
 // ---------- Tự động đọc file CSV ----------
@@ -111,7 +112,7 @@ function addStudent(id, name = '') {
   students.unshift({ id, name, time: currentTime() });
 
   saveLocal();
-
+  sendToSheet(mssv, ten)
   renderList();
   updateStats();
   if (!sessionStart) sessionStart = Date.now();
@@ -353,7 +354,7 @@ function loadLocal() {
 
 function sendToSheet(mssv, ten){
 
-fetch("https://script.google.com/macros/s/AKfycbw5gHIrVmi92Ibrq5DkfNObzKRAd6zWTomohXRHsvx89aFBAiBf7H4r3kh_EMeO-RunBw/exec", {
+fetch("https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec", {
   method: "POST",
   mode: "no-cors",
   headers: {
@@ -365,5 +366,26 @@ fetch("https://script.google.com/macros/s/AKfycbw5gHIrVmi92Ibrq5DkfNObzKRAd6zWTo
     ten: ten
   })
 });
+
+}
+async function syncFromSheet(){
+
+  try {
+
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec");
+    const data = await res.json();
+
+    students = data.filter(r => r.session == sessionId).map(r => ({
+    id: r.mssv,
+    name: r.ten,
+    time: new Date(r.time).toLocaleTimeString('vi-VN')
+  }));
+
+    renderList();
+    updateStats();
+
+  } catch(err) {
+    console.log("Sync error", err);
+  }
 
 }

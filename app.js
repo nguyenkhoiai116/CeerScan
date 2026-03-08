@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   setInterval(updateSessionTimer, 1000);
-  setInterval(syncFromSheet, 3000);
+  setInterval(syncFromSheet, 10000);
 });
 
 // ---------- Tự động đọc file CSV ----------

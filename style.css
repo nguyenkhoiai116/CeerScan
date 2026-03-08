@@ -434,6 +434,7 @@ body::before {
   gap: 10px;
   max-width: 480px;
   margin: 0 auto;
+  z-index: 999;
 }
 
 .btn-export {
@@ -455,7 +456,10 @@ body::before {
 }
 
 .btn-export:active   { transform: scale(0.97); }
-.btn-export:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-export:disabled {
+  background: rgba(5, 150, 105, 0.3);
+  cursor: not-allowed;
+}
 
 /* ---------- Modal nhập tên ---------- */
 .modal-overlay {

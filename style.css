@@ -45,34 +45,15 @@ body::before {
   pointer-events: none;
   z-index: 0;
 }
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
 
-  background-image:url("img/logo.png");
-  background-repeat:no-repeat;
-
-  background-position:center 20vh;
-
-  /* responsive size */
-  background-size:clamp(180px,40vw,420px);
-
-  opacity:0.08;
-  pointer-events:none;
-  z-index:1;
-
-  filter:drop-shadow(0 0 2rem rgba(0,229,255,0.25));
-}
 /* ---------- Layout chính ---------- */
-.app{
-  position:relative;
-  z-index:2;
-  max-width:min(92vw,480px);
-  margin:auto;
-  padding-bottom:6rem;
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 0 100px;
 }
-
 
 /* ---------- Header ---------- */
 .header {
@@ -98,16 +79,8 @@ body::after{
   font-weight: 700;
   color: var(--accent);
   letter-spacing: -0.5px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:bold;
-  font-size:22px;
 }
 
-.logo img{
-  height:40px;
-}
 .logo span { color: var(--text-muted); }
 
 .badge {
@@ -201,11 +174,10 @@ body::after{
 }
 
 /* Vùng video của thư viện */
-#reader{
-  width:100%;
-  aspect-ratio:4/3;
-  min-height:180px;
-  background:#000;
+#reader {
+  width: 100%;
+  min-height: 240px;
+  background: #000;
 }
 
 #reader video {

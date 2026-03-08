@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Quét Mã Sinh Viên</title>
+
+  <!-- Thư viện quét barcode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- CSS riêng -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">SCAN<span>_SV</span></div>
+      <div class="badge">v1.0</div>
+    </div>
+    <div class="subtitle">Quét mã sinh viên · Xuất CSV</div>
+  </div>
+
+  <!-- Thống kê -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-dot"></div>
+      <span id="count-display">0 sinh viên</span>
+    </div>
+    <div class="stat" style="color: var(--text-muted); font-size: 11px; margin-left: auto;">
+      <span id="session-time">--:--</span>
+    </div>
+  </div>
+
+  <!-- Khung camera quét -->
+  <div class="scanner-section">
+    <div class="scanner-card">
+      <div class="scanner-header">
+        <div class="scanner-title">Camera Scanner</div>
+        <div class="scanner-status">
+          <div class="status-dot" id="scan-dot"></div>
+          <span id="scan-status-text">Tắt</span>
+        </div>
+      </div>
+      <!-- Thư viện html5-qrcode sẽ render video vào đây -->
+      <div id="reader"></div>
+      <!-- Góc khung + đường quét overlay -->
+      <div class="scanner-overlay">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <div class="scan-line" id="scan-line" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút bật/tắt camera -->
+  <button class="btn-start" id="btn-toggle-scan">
+    <span>📷</span> Bắt đầu quét
+  </button>
+
+  <!-- Thông báo nhanh (toast) -->
+  <div class="result-toast" id="result-toast"></div>
+
+  <!-- Nhập thủ công -->
+  <div class="manual-section">
+    <div class="section-label">Nhập thủ công</div>
+    <div class="input-row">
+      <input class="input-field" id="manual-input" placeholder="Nhập MSSV..." type="text" />
+      <button class="btn-add" id="btn-add-manual">+</button>
+    </div>
+  </div>
+
+  <!-- Danh sách sinh viên -->
+  <div class="list-section">
+    <div class="list-header">
+      <div class="section-label">Danh sách (<span id="list-count">0</span>)</div>
+      <button class="btn-clear" id="btn-clear-all">Xóa tất cả</button>
+    </div>
+    <div class="student-list" id="student-list">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">Chưa có dữ liệu.<br>Quét hoặc nhập mã sinh viên.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Thanh xuất CSV cố định ở dưới -->
+<div class="export-bar">
+  <button class="btn-export" id="btn-export" disabled>
+    <span>⬇️</span> Xuất CSV
+  </button>
+</div>
+
+<!-- Modal nhập tên sinh viên -->
+<div class="modal-overlay" id="name-modal">
+  <div class="modal">
+    <div class="modal-title">Nhập tên sinh viên</div>
+    <div class="modal-id" id="modal-id-display"></div>
+    <input class="modal-input" id="modal-name-input" placeholder="Họ và tên sinh viên (tuỳ chọn)..." type="text" />
+    <div class="modal-buttons">
+      <button class="btn-modal-skip" id="btn-modal-skip">Bỏ qua</button>
+      <button class="btn-modal-save" id="btn-modal-save">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript riêng — đặt cuối body để DOM đã sẵn sàng -->
+<script src="app.js"></script>
+
+</body>
+</html>

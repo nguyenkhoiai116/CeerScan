@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   setInterval(updateSessionTimer, 1000);
-  setInterval(syncFromSheet, 10000);
+  setInterval(syncFromSheet, 3000);
 });
 
 // ---------- Tự động đọc file CSV ----------
@@ -322,12 +322,12 @@ function loadLocal() {
 function sendToSheet(mssv, ten) {
   fetch(GOOGLE_APP_SCRIPT_URL, {
     method: "POST",
-    mode: "no-cors",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify({
       session: sessionId,
       mssv: mssv,
-      ten: ten
+      ten: ten,
+      time: new Date().toISOString()
     })
   });
 }
@@ -341,34 +341,24 @@ function syncFromSheet() {
   script.src = GOOGLE_APP_SCRIPT_URL + "?session=" + sessionId + "&callback=handleSheetData";
   document.body.appendChild(script);
 }
-
 function handleSheetData(data) {
-  // 1. Lọc và chuẩn hóa dữ liệu từ Sheet
+
   const sheetStudents = data
     .filter(r => r.session === sessionId)
     .map(r => ({
       id: String(r.mssv),
       name: r.ten,
       time: new Date(r.time).toLocaleTimeString('vi-VN')
-    }))
-    .reverse(); // Đảo ngược mảng để dữ liệu mới nhất lên đầu (giống trên máy)
+    }));
 
-  // 2. CHỐNG GHI ĐÈ DỮ LIỆU CŨ (Fix lỗi mất liền)
-  // Nếu dữ liệu từ Sheet tải về ít hơn số người máy đang hiển thị
-  // -> Sheet chưa lưu kịp -> Bỏ qua, giữ nguyên màn hình hiện tại
-  if (sheetStudents.length < students.length) {
-    return;
-  }
+  const existingIds = new Set(students.map(s => s.id));
 
-  // 3. Kiểm tra xem có thật sự có dữ liệu mới không (so sánh theo mssv)
-  // (Thay vì dùng JSON.stringify rất dễ lỗi định dạng thời gian)
-  const currentIds = students.map(s => s.id).join(',');
-  const sheetIds = sheetStudents.map(s => s.id).join(',');
+  sheetStudents.forEach(s => {
+    if (!existingIds.has(s.id)) {
+      students.unshift(s);
+    }
+  });
 
-  if (currentIds === sheetIds) return;
-
-  // 4. Cập nhật khi có dữ liệu mới (ví dụ: máy tính khác quét)
-  students = sheetStudents;
   saveLocal();
   renderList();
   updateStats();

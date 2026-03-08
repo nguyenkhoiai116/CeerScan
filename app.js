@@ -250,25 +250,19 @@ async function stopScan() {
 }
 
 // ---------- Xử lý Quét Thành công ----------
-// ---------- Xử lý Quét Thành công ----------
 function onScanSuccess(decodedText) {
   const id = decodedText.trim();
   const now = Date.now();
 
-  // Chống camera quét đi quét lại cùng 1 mã trong 2 giây
   if (id === lastScannedId && (now - lastScanTime) < 2000) return;
   lastScannedId = id;
   lastScanTime = now;
 
-  // HIỆN THÔNG BÁO NẾU QUÉT TRÙNG MÃ ĐÃ CÓ TRONG DANH SÁCH
-  if (students.find(s => s.id === id)) {
-    showToast('⚠️ MSSV ' + id + ' đã điểm danh!', true);
-    return; 
-  }
+  if (students.find(s => s.id === id)) return; 
 
   let name = studentDB[id] || "";
 
-  // Hỏi tên nếu MSSV chưa có trong CSV
+  // TÍNH NĂNG MỚI: Hỏi tên nếu MSSV chưa có trong CSV
   if (name === "") {
     playBeep(); // Kêu 1 tiếng để người quét chú ý nhìn màn hình
     const inputName = prompt(`⚠️ MSSV ${id} chưa có trong danh sách!\nVui lòng nhập họ và tên sinh viên:`);
@@ -280,7 +274,7 @@ function onScanSuccess(decodedText) {
     }
     
     name = inputName.trim();
-    studentDB[id] = name; // Lưu tên vừa nhập vào bộ nhớ tạm
+    studentDB[id] = name; // Lưu tên vừa nhập vào bộ nhớ tạm để dùng lại nếu cần
   }
 
   const ok = addStudent(id, name);

@@ -2,29 +2,37 @@
    app.js — Quét Mã Sinh Viên (Đọc trực tiếp từ CSV)
    ============================================= */
 
+// ---------- Hàm lấy ngày hiện tại chuẩn giờ VN ----------
+function getCurrentDate() {
+  const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+  return (new Date(Date.now() - tzOffset)).toISOString().slice(0,10);
+}
+
 // ---------- State (dữ liệu ứng dụng) ----------
-let studentDB   = {};   // Sẽ được tự động điền từ file CSV
+let studentDB   = {};   
 let students    = [];   
 let html5QrCode = null; 
 let isScanning  = false;
 let sessionStart = null;
-let lastScannedId = null; // Tránh quét lặp 1 mã quá nhanh
+let lastScannedId = null; 
 let lastScanTime = 0;
-let sessionId = new Date().toISOString().slice(0,10);
+let sessionId = getCurrentDate(); // Đã sửa: Lấy chuẩn ngày giờ địa phương
+
+// Bỏ URL Web App của bạn vào đây để dễ quản lý
+const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec";
+
 // ---------- Khởi tạo sau khi DOM sẵn sàng ----------
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Tải dữ liệu từ file CSV trước
   await loadStudentData();
   loadLocal();
   renderList();
   updateStats();
-  // 2. Gắn sự kiện cho các nút
+  
   document.getElementById('btn-toggle-scan').addEventListener('click', toggleScan);
   document.getElementById('btn-add-manual').addEventListener('click', addManual);
   document.getElementById('btn-clear-all').addEventListener('click', clearAll);
   document.getElementById('btn-export').addEventListener('click', exportCSV);
   
-  // Nhấn Enter trong ô nhập thủ công
   document.getElementById('manual-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') addManual();
   });
@@ -36,26 +44,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ---------- Tự động đọc file CSV ----------
 async function loadStudentData() {
   try {
-    // Đọc file thanhVienCeer.csv (phải cùng nằm trong thư mục)
     const response = await fetch('thanhVienCeer.csv');
     if (!response.ok) throw new Error('Không tìm thấy file');
     
     const text = await response.text();
     const lines = text.split('\n');
     
-    // Bỏ qua dòng tiêu đề (index 0), bắt đầu từ index 1
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
       const parts = line.split(',');
-      // Format file của bạn: STT,Họ và Tên,MSSV,Đang là
       if (parts.length >= 3) {
-        const name = parts[1].trim(); // Cột 2: Họ và Tên
-        const id = parts[2].trim();   // Cột 3: MSSV
-        if (id) {
-          studentDB[id] = name;
-        }
+        const name = parts[1].trim(); 
+        const id = parts[2].trim();   
+        if (id) studentDB[id] = name;
       }
     }
     showToast(`✅ Đã tải dữ liệu ${Object.keys(studentDB).length} sinh viên từ file CSV!`);
@@ -106,11 +109,9 @@ function playBeep() {
 
 // ---------- Quản lý danh sách ----------
 function addStudent(id, name = '') {
-  if (students.find(s => s.id === id)) {
-    return false; // Đã điểm danh rồi thì bỏ qua
-  }
+  if (students.find(s => s.id === id)) return false; 
+  
   students.unshift({ id, name, time: currentTime() });
-
   saveLocal();
   sendToSheet(id, name);
   renderList();
@@ -131,12 +132,9 @@ function clearAll() {
   if (!confirm('Xóa tất cả ' + students.length + ' sinh viên?')) return;
 
   students = [];
-
   localStorage.removeItem("students");
-
   sessionStart = null;
-  sessionId = new Date().toISOString().slice(0,10); // tạo phiên mới
-
+  sessionId = getCurrentDate(); // Đã sửa
   document.getElementById('session-time').textContent = '--:--';
 
   renderList();
@@ -149,7 +147,6 @@ function updateStats() {
 
 function renderList() {
   const listEl = document.getElementById('student-list');
-  const isNew = Date.now() - new Date("1970/01/01 " + s.time).getTime() < 5000;
   document.getElementById('list-count').textContent = students.length;
   document.getElementById('btn-export').disabled = students.length === 0; 
 
@@ -195,11 +192,8 @@ function addManual() {
 
 // ---------- Camera & Quét ----------
 async function toggleScan() {
-  if (!isScanning) {
-    await startScan();
-  } else {
-    await stopScan();
-  }
+  if (!isScanning) await startScan();
+  else await stopScan();
 }
 
 async function startScan() {
@@ -245,20 +239,13 @@ function onScanSuccess(decodedText) {
   const id = decodedText.trim();
   const now = Date.now();
 
-  // Chống spam: Tránh quét lại cùng 1 mã trong vòng 2 giây
-  if (id === lastScannedId && (now - lastScanTime) < 2000) {
-    return;
-  }
+  if (id === lastScannedId && (now - lastScanTime) < 2000) return;
   lastScannedId = id;
   lastScanTime = now;
 
-  if (students.find(s => s.id === id)) {
-      return; 
-  }
+  if (students.find(s => s.id === id)) return; 
 
-  // Tra cứu Tên từ Database vừa lấy từ CSV
   const name = studentDB[id] || "";
-
   const ok = addStudent(id, name);
   if (ok) {
     playBeep();
@@ -266,7 +253,7 @@ function onScanSuccess(decodedText) {
   }
 }
 
-// ---------- Xuất CSV (Siêu tương thích) ----------
+// ---------- Xuất CSV ----------
 function exportCSV() {
   if (students.length === 0) {
     showToast('⚠️ Chưa có dữ liệu để xuất!', true);
@@ -280,120 +267,94 @@ function exportCSV() {
   ).join('\n');
 
   const csvContent = BOM + header + rows;
-  const dateStr    = new Date().toISOString().slice(0, 10);
-  const fileName   = `DiemDanh_${dateStr}.csv`;
+  const fileName   = `DiemDanh_${getCurrentDate()}.csv`; // Đã sửa
 
   try {
-    // Cách 1: Thử dùng Blob (Cách hiện đại)
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    
     const link = document.createElement('a');
     link.setAttribute('href', url);
     link.setAttribute('download', fileName);
     link.style.display = 'none';
-    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
     showToast('✅ Đã tải thành công file Excel!');
-    
   } catch (err) {
-    console.warn('Tải bằng Blob thất bại, chuyển sang Data URI...', err);
-    
-    // Cách 2: Dùng Data URI (Cách dự phòng cho trình duyệt khó tính/điện thoại)
     try {
       const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
       const link = document.createElement('a');
       link.setAttribute('href', encodedUri);
       link.setAttribute('download', fileName);
       link.style.display = 'none';
-      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
       showToast('✅ Đã tải file bằng phương pháp dự phòng!');
     } catch (fallbackErr) {
-      alert('❌ Trình duyệt của bạn chặn tải file. Vui lòng mở bằng Chrome hoặc Safari bản mới nhất!');
+      alert('❌ Trình duyệt chặn tải file. Vui lòng mở bằng Chrome hoặc Safari!');
     }
   }
 }
 
 /* =========================
-   LOCAL STORAGE
+   LOCAL STORAGE & ĐỒNG BỘ
 ========================= */
-
 function saveLocal() {
   localStorage.setItem("students", JSON.stringify(students));
 }
 
 function loadLocal() {
-
   const savedDate = localStorage.getItem("scanDate");
   const today = new Date().toDateString();
 
-  // Nếu sang ngày mới → reset
   if (savedDate !== today) {
     localStorage.removeItem("students");
     localStorage.setItem("scanDate", today);
     students = [];
     return;
   }
-
   const data = localStorage.getItem("students");
-
-  if (data) {
-    students = JSON.parse(data);
-  }
-
+  if (data) students = JSON.parse(data);
 }
 
-function sendToSheet(mssv, ten){
-
-fetch("https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec", {
-  method: "POST",
-  mode: "no-cors",
-  headers: {
-    "Content-Type": "text/plain"
-  },
-  body: JSON.stringify({
-    session: sessionId,
-    mssv: mssv,
-    ten: ten
-  })
-});
-
+function sendToSheet(mssv, ten) {
+  fetch(GOOGLE_APP_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify({
+      session: sessionId,
+      mssv: mssv,
+      ten: ten
+    })
+  });
 }
+
 function syncFromSheet() {
-
   const old = document.getElementById("syncScript");
   if (old) old.remove();
 
   const script = document.createElement("script");
   script.id = "syncScript";
-  script.src =
-  "https://script.google.com/macros/s/AKfycbzLIKZwfd8b79UVBtP0c7ILIW-JiBvUk3KOYqlAYK5KX75CbmrizVKg2chlHTl_Fr5Z/exec"
-  + "?session=" + sessionId
-  + "&callback=handleSheetData";
+  script.src = GOOGLE_APP_SCRIPT_URL + "?session=" + sessionId + "&callback=handleSheetData";
   document.body.appendChild(script);
 }
-function handleSheetData(data) {
 
+function handleSheetData(data) {
   const newStudents = data
-  .filter(r => r.session == sessionId)
-  .map(r => ({
-    id: r.mssv,
-    name: r.ten,
-    time: new Date(r.time).toLocaleTimeString('vi-VN')
-  }));
+    .filter(r => r.session === sessionId)
+    .map(r => ({
+      id: String(r.mssv),
+      name: r.ten,
+      time: new Date(r.time).toLocaleTimeString('vi-VN')
+    }));
 
   if (JSON.stringify(newStudents) === JSON.stringify(students)) return;
 
   students = newStudents;
-
   renderList();
   updateStats();
 }
+// HẾT FILE app.js

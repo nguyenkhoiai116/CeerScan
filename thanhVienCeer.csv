@@ -37,7 +37,7 @@ STT,Họ và Tên,MSSV,Đang là
 36,Nguyễn Quốc Khánh,23142318,Thành viên
 37,Trần Trọng Đăng Khoa,24149036,CTV
 38,Phạm Anh Khôi,25142062,CTV
-39,Nguyễn Khắc Minh Khôi, 24134035,Thành viên
+39,Nguyễn Khắc Minh Khôi,24134035,Thành viên
 40,Lê Hải Lam,24951009,Thành viên
 41,Phạm Thanh Lâm,24151045,CTV
 42,Đặng Nhật Linh,22132067,Thành viên
@@ -60,52 +60,53 @@ STT,Họ và Tên,MSSV,Đang là
 59,Đặng Như Ngọc,24156083,CTV
 60,Võ Thiện Nhân,25145083,CTV
 61,Nguyễn Thảo Nhi,25109071,CTV
-62,Trịnh Quỳnh Như,25125116,CTV
-63,Hồ Đắc Phát,23126032,Thành viên
-64,Lê Tấn Phát,23146024,Thành viên
-65,Nguyễn Tấn Phát,23110284,Thành viên
-66,Huỳnh Quang Phú,25161063,CTV
-67,Huỳnh Triệu Phúc,24161040,Thành viên
-68,Phan Bảo Phúc,25124045,CTV
-69,Trần Lê Mai Phương,24125094,Thành viên
-70,Đặng Minh Quân,23144292,Thành viên
-71,Trần Phan Nhật Quang,24145055,Thành viên
-72,Lê Thị Diễm Quỳnh,24125102,CTV
-73,Lê Thành Tài,25143161,CTV
-74,Phạm Tuấn Tài,24131139,CTV
-75,Nguyễn Thanh Tân,24142079,Thành viên
-76,Nguyễn Võ Minh Tân,25128232,CTV
-77,Trần Hoàng Nhật Thanh,24126203,Thành viên
-78,Đồng Trinh Thao,25161074,CTV
-79,Nguyễn Thị Thu Thảo,23125109,Thành viên
-80,Nguyễn Ngọc Mai Thi,24126212,CTV
-81,Mai Quốc Thịnh,23135049,Thành viên
-82,Nguyễn Tiến Thịnh,25132147,CTV
-83,Phạm Anh Thư,24164043,Thành viên
-84,Nguyễn Minh Thư,22126056,Thành viên
-85,Trần Phúc Anh Thư,22131903,Thành viên
-86,Lê Thị Anh Thư,25124176,CTV
-87,Dương Ý Thương,24136097,Thành viên
-88,Trương Ngọc Thương,24159064,Thành viên
-89,Lê Triều Tính,24124079,CTV
-90,Huỳnh Nữ Bảo Trân,24156133,CTV
-91,Huỳnh Thị Thùy Trang,25128260,CTV
-92,Đỗ Minh Trí,23135052,Thành viên
-93,Phạm Trí,22142240,Thành viên
-94,Nguyễn Mai Triều,24124084,Thành viên
-95,Phan Thanh Trúc,24150078,Thành viên
-96,Ngô Hoàng Thanh Trúc,24164049,Thành viên
-97,Bùi Đặng Quang Trung,23161349,Thành viên
-98,Võ Văn Tú,23110359,Thành viên
-99,Nguyễn Mai Thanh Tú,24149075,Thành viên
-100,Nguyễn Phong Tuấn,22146249,Thành viên
-101,Lê Xuân Tùng,25142383,CTV
-102,Bùi Ngọc Tuyên,24145177,Thành viên
-103,Nguyễn Thị Bạch Tuyết,23132136,Thành viên
-104,Hà Thị Kim Uyên,25131174,CTV
-105,Trịnh Lê Thảo Vân,24164056,Thành viên
-106,Nguyễn Văn Việt,24139062,Thành viên
-107,Ngô Đình Nhật Vinh,24143160,Thành viên
-108,Nguyễn Thị Tường Vy,23125131,Thành viên
-109,Nguyễn Ngọc Thảo Vy,25136177,CTV
-110,Trần Thị Kim Yến,22125079,Thành viên
+62,Lê Trần Thanh Nhiên,23142368,Thành viên
+63,Trịnh Quỳnh Như,25125116,CTV
+64,Hồ Đắc Phát,23126032,Thành viên
+65,Lê Tấn Phát,23146024,Thành viên
+66,Nguyễn Tấn Phát,23110284,Thành viên
+67,Huỳnh Quang Phú,25161063,CTV
+68,Huỳnh Triệu Phúc,24161040,Thành viên
+69,Phan Bảo Phúc,25124045,CTV
+70,Trần Lê Mai Phương,24125094,Thành viên
+71,Đặng Minh Quân,23144292,Thành viên
+72,Trần Phan Nhật Quang,24145055,Thành viên
+73,Lê Thị Diễm Quỳnh,24125102,CTV
+74,Lê Thành Tài,25143161,CTV
+75,Phạm Tuấn Tài,24131139,CTV
+76,Nguyễn Thanh Tân,24142079,Thành viên
+77,Nguyễn Võ Minh Tân,25128232,CTV
+78,Trần Hoàng Nhật Thanh,24126203,Thành viên
+79,Đồng Trinh Thao,25161074,CTV
+80,Nguyễn Thị Thu Thảo,23125109,Thành viên
+81,Nguyễn Ngọc Mai Thi,24126212,CTV
+82,Mai Quốc Thịnh,23135049,Thành viên
+83,Nguyễn Tiến Thịnh,25132147,CTV
+84,Phạm Anh Thư,24164043,Thành viên
+85,Nguyễn Minh Thư,22126056,Thành viên
+86,Trần Phúc Anh Thư,22131903,Thành viên
+87,Lê Thị Anh Thư,25124176,CTV
+88,Dương Ý Thương,24136097,Thành viên
+89,Trương Ngọc Thương,24159064,Thành viên
+90,Lê Triều Tính,24124079,CTV
+91,Huỳnh Nữ Bảo Trân,24156133,CTV
+92,Huỳnh Thị Thùy Trang,25128260,CTV
+93,Đỗ Minh Trí,23135052,Thành viên
+94,Phạm Trí,22142240,Thành viên
+95,Nguyễn Mai Triều,24124084,Thành viên
+96,Phan Thanh Trúc,24150078,Thành viên
+97,Ngô Hoàng Thanh Trúc,24164049,Thành viên
+98,Bùi Đặng Quang Trung,23161349,Thành viên
+99,Võ Văn Tú,23110359,Thành viên
+100,Nguyễn Mai Thanh Tú,24149075,Thành viên
+101,Nguyễn Phong Tuấn,22146249,Thành viên
+102,Lê Xuân Tùng,25142383,CTV
+103,Bùi Ngọc Tuyên,24145177,Thành viên
+104,Nguyễn Thị Bạch Tuyết,23132136,Thành viên
+105,Hà Thị Kim Uyên,25131174,CTV
+106,Trịnh Lê Thảo Vân,24164056,Thành viên
+107,Nguyễn Văn Việt,24139062,Thành viên
+108,Ngô Đình Nhật Vinh,24143160,Thành viên
+109,Nguyễn Thị Tường Vy,23125131,Thành viên
+110,Nguyễn Ngọc Thảo Vy,25136177,CTV
+111,Trần Thị Kim Yến,22125079,Thành viên

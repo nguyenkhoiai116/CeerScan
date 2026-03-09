@@ -80,7 +80,7 @@ body::before {
   color: var(--accent);
   letter-spacing: -0.5px;
 }
-
+.logo2 { font-size: 14px; color: var(--text-muted); height: 40px; }
 .logo span { color: var(--text-muted); }
 
 .badge {
